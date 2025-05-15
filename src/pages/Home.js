@@ -11,8 +11,8 @@ function Home() {
   }, []);
 
   return (
-    <div>
-      <h1>Blog Home</h1>
+    <div className="max-w-2xl mx-auto mt-8">
+      <h1 className="text-3xl font-bold mb-6 text-center">Blog Home</h1>
       <PostList posts={posts} />
     </div>
   );
