@@ -1,15 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
-import Profile from './pages/Profile';
 import PostDetail from './pages/PostDetail';
 import Login from './components/Login';
 import Register from './components/Register';
+import UserProfile from './pages/UserProfile';
 import './App.css';
 
 function App() {
   const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      fetch('/api/user/me', {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+        .then(res => {
+          if (!res.ok) throw new Error('Not authenticated');
+          return res.json();
+        })
+        .then(profile => {
+          setUser(profile);
+          localStorage.setItem('user', JSON.stringify(profile));
+        })
+        .catch(() => {
+          setUser(null);
+          localStorage.removeItem('user');
+        });
+    }
+  }, []);
 
   const handleLogin = async (email, password) => {
     const res = await fetch('/api/auth/login', {
@@ -20,7 +41,14 @@ function App() {
     if (res.ok) {
       const data = await res.json();
       localStorage.setItem('token', data.token);
-      setUser({ email }); // Optionally fetch user profile here
+      fetch('/api/user/me', {
+        headers: { Authorization: `Bearer ${data.token}` }
+      })
+        .then(res => res.json())
+        .then(profile => {
+          setUser(profile);
+          localStorage.setItem('user', JSON.stringify(profile));
+        });
     } else {
       alert('Login failed');
     }
@@ -41,6 +69,7 @@ function App() {
 
   const handleLogout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('user');
     setUser(null);
   };
 
@@ -49,8 +78,8 @@ function App() {
       <Navbar user={user} onLogout={handleLogout} />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/profile" element={<Profile />} />
         <Route path="/posts/:id" element={<PostDetail />} />
+        <Route path="/user/:id" element={<UserProfile />} />
         <Route path="/login" element={<Login onLogin={handleLogin} />} />
         <Route path="/register" element={<Register onRegister={handleRegister} />} />
       </Routes>

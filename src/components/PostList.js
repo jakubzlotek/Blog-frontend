@@ -1,18 +1,21 @@
 import React from 'react';
+import Post from './Post';
 
-function PostList({ posts }) {
+function PostList({ posts, lastPostRef }) {
   return (
-    <div className="space-y-6">
-      <h2 className="text-xl font-semibold mb-4">Posts</h2>
+    <div className="bg-white border border-gray-200 rounded-xl shadow p-2">
       {posts && posts.length > 0 ? (
-        posts.map(post => (
-          <div key={post.id} className="bg-white rounded shadow p-4">
-            <h3 className="text-lg font-bold mb-2">{post.title}</h3>
-            <p className="text-gray-700">{post.content}</p>
+        posts.map((post, idx) => (
+          <div
+            key={post.id}
+            ref={idx === posts.length - 1 ? lastPostRef : null}
+            className={idx !== posts.length - 1 ? 'mb-4' : ''}
+          >
+            <Post post={post} />
           </div>
         ))
       ) : (
-        <p className="text-gray-500">No posts found.</p>
+        <p className="text-gray-500 p-4 text-center">No posts found.</p>
       )}
     </div>
   );
