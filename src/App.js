@@ -78,12 +78,6 @@ function App() {
     <Router>
       <Toaster position="top-right" />
       <Navbar user={user} onLogout={handleLogout} />
-
-     {/* tu widget */}
-      <div className="mx-auto max-w-4xl p-4">
-        <TemperatureWidget />
-      </div>
-
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/posts/:id" element={<PostDetail />} />
