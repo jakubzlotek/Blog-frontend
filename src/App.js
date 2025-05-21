@@ -22,8 +22,8 @@ function App() {
           return res.json();
         })
         .then(profile => {
-          setUser(profile);
-          localStorage.setItem('user', JSON.stringify(profile));
+          setUser(profile.user);
+          localStorage.setItem('user', JSON.stringify(profile.user));
         })
         .catch(() => {
           setUser(null);
@@ -46,8 +46,8 @@ function App() {
       })
         .then(res => res.json())
         .then(profile => {
-          setUser(profile);
-          localStorage.setItem('user', JSON.stringify(profile));
+          setUser(profile.user);
+          localStorage.setItem('user', JSON.stringify(profile.user));
         });
     } else {
       alert('Login failed');
