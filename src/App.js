@@ -5,9 +5,12 @@ import './App.css';
 import Login from './components/Login';
 import Navbar from './components/Navbar';
 import Register from './components/Register';
+import TemperatureWidget from './components/TemperatureWidget';
 import Home from './pages/Home';
 import PostDetail from './pages/PostDetail';
 import UserProfile from './pages/UserProfile';
+import './App.css';
+import TemperatureWidget from './components/TemperatureWidget';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -23,8 +26,8 @@ function App() {
           return res.json();
         })
         .then(profile => {
-          setUser(profile);
-          localStorage.setItem('user', JSON.stringify(profile));
+          setUser(profile.user);
+          localStorage.setItem('user', JSON.stringify(profile.user));
         })
         .catch(() => {
           setUser(null);
@@ -47,8 +50,8 @@ function App() {
       });
       if (profileRes.ok) {
         const profile = await profileRes.json();
-        setUser(profile);
-        localStorage.setItem('user', JSON.stringify(profile));
+        setUser(profile.user);
+        localStorage.setItem('user', JSON.stringify(profile.user));
       }
     } else {
       throw new Error('Login failed');
@@ -73,10 +76,16 @@ function App() {
     setUser(null);
   };
 
-  return (
+    return (
     <Router>
       <Toaster position="top-right" />
       <Navbar user={user} onLogout={handleLogout} />
+
+     {/* tu widget */}
+      <div className="mx-auto max-w-4xl p-4">
+        <TemperatureWidget />
+      </div>
+
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/posts/:id" element={<PostDetail />} />

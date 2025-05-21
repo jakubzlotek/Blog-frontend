@@ -13,22 +13,30 @@ function Home() {
 
   const fetchPosts = useCallback(async () => {
     setLoading(true);
-    const res = await fetch(`/api/posts?page=${page}&limit=10`);
-    const data = await res.json();
-    // Fetch comments and likes for new posts
-    const postsWithExtras = await Promise.all(
-      data.map(async post => {
-        const [commentsRes, likesRes] = await Promise.all([
-          fetch(`/api/posts/${post.id}/comments`),
-          fetch(`/api/posts/${post.id}/like`)
-        ]);
-        const comments = await commentsRes.json();
-        const likes = await likesRes.json();
-        return { ...post, comments, likesCount: likes.length };
-      })
-    );
-    setPosts(prev => [...prev, ...postsWithExtras]);
-    setHasMore(postsWithExtras.length === 10);
+    try {
+      const res = await fetch(`/api/posts?page=${page}&limit=10`);
+      const data = await res.json();
+
+      // Ensure data is always an array
+      const postsArray = Array.isArray(data) ? data : Array.isArray(data.posts) ? data.posts : [];
+
+      // Fetch comments and likes for new posts
+      const postsWithExtras = await Promise.all(
+        postsArray.map(async post => {
+          const [commentsRes, likesRes] = await Promise.all([
+            fetch(`/api/posts/${post.id}/comments`),
+            fetch(`/api/posts/${post.id}/like`)
+          ]);
+          const comments = await commentsRes.json().then(data => data.comments || []);
+          const likes = await likesRes.json().then(data => data.likes || []);
+          return { ...post, comments, likesCount: Array.isArray(likes) ? likes.length : 0 };
+        })
+      );
+      setPosts(prev => [...prev, ...postsWithExtras]);
+      setHasMore(postsWithExtras.length === 10);
+    } catch (error) {
+      setHasMore(false);
+    }
     setLoading(false);
   }, [page]);
 

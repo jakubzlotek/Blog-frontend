@@ -25,13 +25,13 @@ function UserProfile() {
       const userRes = await fetch(`/api/user/${id}`);
       if (userRes.ok) {
         const userData = await userRes.json();
-        setUser(userData);
+        setUser(userData.user);
         setForm({ username: userData.username, email: userData.email, password: '' });
       }
       const postsRes = await fetch(`/api/posts?user_id=${id}`);
       if (postsRes.ok) {
         const postsData = await postsRes.json();
-        setPosts(postsData.filter(p => p.user_id === Number(id)));
+        setPosts(postsData.posts.filter(p => p.user_id === Number(id)));
       }
       setLoading(false);
     }
