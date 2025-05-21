@@ -6,7 +6,6 @@ export default function TemperatureWidget() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const apiKey = process.env.REACT_APP_WEATHER_API_KEY;
     if (!navigator.geolocation) {
       setError('Twoja przeglądarka nie wspiera geolokalizacji');
       setLoading(false);
@@ -16,15 +15,16 @@ export default function TemperatureWidget() {
     navigator.geolocation.getCurrentPosition(
       ({ coords }) => {
         const { latitude, longitude } = coords;
-        const url = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=${apiKey}`;
+        const url = `https://wttr.in/${latitude},${longitude}?format=%t`;
 
         fetch(url)
           .then(res => {
             if (!res.ok) throw new Error('Błąd podczas pobierania pogody');
-            return res.json();
+            return res.text();
           })
           .then(data => {
-            setTemp(Math.round(data.main.temp));
+            const temperature = data.replace('+', '').replace('°C', '').trim();
+            setTemp(temperature);
           })
           .catch(err => {
             console.error(err);
@@ -44,7 +44,7 @@ export default function TemperatureWidget() {
   }, []);
 
   if (loading) return <div>Ładowanie pogody…</div>;
-  if (error)   return <div className="text-red-500">{error}</div>;
+  if (error) return <div className="text-red-500">{error}</div>;
 
   return (
     <div className="p-4 bg-blue-100 rounded shadow">
