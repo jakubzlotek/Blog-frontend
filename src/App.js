@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Toaster } from 'react-hot-toast';
+import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+import './App.css';
+import Login from './components/Login';
 import Navbar from './components/Navbar';
+import Register from './components/Register';
 import Home from './pages/Home';
 import PostDetail from './pages/PostDetail';
-import Login from './components/Login';
-import Register from './components/Register';
 import UserProfile from './pages/UserProfile';
-import './App.css';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -32,25 +33,25 @@ function App() {
     }
   }, []);
 
-  const handleLogin = async (email, password) => {
+  const handleLogin = async (identifier, password) => {
     const res = await fetch('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
+      body: JSON.stringify({ identifier, password })
     });
     if (res.ok) {
       const data = await res.json();
       localStorage.setItem('token', data.token);
-      fetch('/api/user/me', {
+      const profileRes = await fetch('/api/user/me', {
         headers: { Authorization: `Bearer ${data.token}` }
-      })
-        .then(res => res.json())
-        .then(profile => {
-          setUser(profile);
-          localStorage.setItem('user', JSON.stringify(profile));
-        });
+      });
+      if (profileRes.ok) {
+        const profile = await profileRes.json();
+        setUser(profile);
+        localStorage.setItem('user', JSON.stringify(profile));
+      }
     } else {
-      alert('Login failed');
+      throw new Error('Login failed');
     }
   };
 
@@ -60,10 +61,9 @@ function App() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, email, password })
     });
-    if (res.ok) {
-      alert('Registration successful! Please log in.');
-    } else {
-      alert('Registration failed');
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.message || 'Registration failed');
     }
   };
 
@@ -75,6 +75,7 @@ function App() {
 
   return (
     <Router>
+      <Toaster position="top-right" />
       <Navbar user={user} onLogout={handleLogout} />
       <Routes>
         <Route path="/" element={<Home />} />
