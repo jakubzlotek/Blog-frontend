@@ -7,6 +7,7 @@ import Login from './components/Login';
 import Register from './components/Register';
 import UserProfile from './pages/UserProfile';
 import './App.css';
+import TemperatureWidget from './components/TemperatureWidget';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -73,9 +74,15 @@ function App() {
     setUser(null);
   };
 
-  return (
+   return (
     <Router>
       <Navbar user={user} onLogout={handleLogout} />
+
+     {/* tu widget */}
+      <div className="mx-auto max-w-4xl p-4">
+        <TemperatureWidget />
+      </div>
+
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/posts/:id" element={<PostDetail />} />
