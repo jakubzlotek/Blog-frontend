@@ -24,8 +24,9 @@ function App() {
           return res.json();
         })
         .then(profile => {
-          setUser(profile.user);
-          localStorage.setItem('user', JSON.stringify(profile.user));
+          // backend zwraca od razu obiekt { id, username, email, ... }
+          setUser(profile);
+          localStorage.setItem('user', JSON.stringify(profile));
         })
         .catch(() => {
           setUser(null);
@@ -40,20 +41,18 @@ function App() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ identifier, password })
     });
-    if (res.ok) {
-      const data = await res.json();
-      localStorage.setItem('token', data.token);
-      const profileRes = await fetch('/api/user/me', {
-        headers: { Authorization: `Bearer ${data.token}` }
-      })
-        .then(res => res.json())
-        .then(profile => {
-          setUser(profile.user);
-          localStorage.setItem('user', JSON.stringify(profile.user));
-        });
-    } else {
-      throw new Error('Login failed');
-    }
+    if (!res.ok) throw new Error('Login failed');
+    const data = await res.json();
+    localStorage.setItem('token', data.token);
+
+    // po zalogowaniu pobierz profil i ustaw go w stanie
+    const profileRes = await fetch('/api/user/me', {
+      headers: { Authorization: `Bearer ${data.token}` }
+    });
+    if (!profileRes.ok) throw new Error('Could not fetch profile');
+    const profile = await profileRes.json();
+    setUser(profile);
+    localStorage.setItem('user', JSON.stringify(profile));
   };
 
   const handleRegister = async (username, email, password) => {
@@ -79,7 +78,7 @@ function App() {
       <Toaster position="top-right" />
       <Navbar user={user} onLogout={handleLogout} />
 
-     {/* tu widget */}
+      {/* tu widget */}
       <div className="mx-auto max-w-4xl p-4">
         <TemperatureWidget />
       </div>

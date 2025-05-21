@@ -1,105 +1,112 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { toast } from 'react-hot-toast';
+import { FaCamera, FaEdit, FaEnvelope, FaSave, FaTimes, FaUser } from 'react-icons/fa';
 import { useParams } from 'react-router-dom';
-import { FaUser, FaEnvelope, FaEdit, FaSave, FaTimes, FaCamera } from 'react-icons/fa';
 import Post from '../components/Post';
 
 function UserProfile() {
   const { id } = useParams();
-  const [user, setUser] = useState(null);
-  const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  // For editing
-  const [editing, setEditing] = useState(false);
-  const [form, setForm] = useState({ username: '', email: '', password: '' });
-  const [editLoading, setEditLoading] = useState(false);
+  const [user, setUser]         = useState(null);
+  const [posts, setPosts]       = useState([]);
+  const [loading, setLoading]   = useState(true);
+  const [editing, setEditing]   = useState(false);
+  const [form, setForm]         = useState({ username: '', email: '', password: '' });
+  const [editLoading, setEditLoading]       = useState(false);
   const [avatarUploading, setAvatarUploading] = useState(false);
 
-  // Get current user id from localStorage
   const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
-  const isCurrentUser = currentUser && currentUser.id && String(currentUser.id) === id;
+  const isCurrentUser = currentUser.id && String(currentUser.id) === id;
 
   useEffect(() => {
     async function fetchUserAndPosts() {
       setLoading(true);
+
+      // Fetch user profile
       const userRes = await fetch(`/api/user/${id}`);
       if (userRes.ok) {
         const userData = await userRes.json();
-        setUser(userData.user);
+        setUser(userData);
         setForm({ username: userData.username, email: userData.email, password: '' });
       }
-      const postsRes = await fetch(`/api/posts?user_id=${id}`);
+
+      // Fetch user's posts
+      const postsRes = await fetch(`/api/user/${id}/posts`);
       if (postsRes.ok) {
         const postsData = await postsRes.json();
-        setPosts(postsData.posts.filter(p => p.user_id === Number(id)));
+        setPosts(postsData);
       }
+
       setLoading(false);
     }
     fetchUserAndPosts();
   }, [id]);
 
   const handleChange = e => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleEdit = () => setEditing(true);
 
   const handleCancel = () => {
     setEditing(false);
-    setForm({ username: user.username, email: user.email, password: '' });
+    if (user) {
+      setForm({ username: user.username, email: user.email, password: '' });
+    }
   };
 
   const handleSubmit = async e => {
     e.preventDefault();
     setEditLoading(true);
-    const token = localStorage.getItem('token');
-    const res = await fetch('/api/user/me', {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify(form)
-    });
-    if (res.ok) {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch('/api/user/me', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify(form)
+      });
+      if (!res.ok) throw new Error('Could not update profile');
       const updated = await res.json();
+      toast.success('Profile updated!');
       setUser(updated);
       setEditing(false);
-    } else {
-      alert('Could not update profile');
+    } catch (err) {
+      toast.error(err.message);
+      console.error('Profile update error:', err);
+    } finally {
+      setEditLoading(false);
     }
-    setEditLoading(false);
   };
 
-  const handleAvatarChange = async (e) => {
+  const handleAvatarChange = async e => {
     const file = e.target.files[0];
     if (!file) return;
     setAvatarUploading(true);
-    const formData = new FormData();
-    formData.append('avatar', file);
-    const token = localStorage.getItem('token');
-    const res = await fetch('/api/user/me/avatar', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      body: formData,
-    });
-    if (res.ok) {
-      const data = await res.json();
-      setUser(prev => {
-        const updatedUser = { ...prev, avatar_url: data.avatar_url };
-        localStorage.setItem('user', JSON.stringify(updatedUser));
-        return updatedUser;
+    try {
+      const formData = new FormData();
+      formData.append('avatar', file);
+      const token = localStorage.getItem('token');
+      const res = await fetch('/api/user/me/avatar', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData
       });
-    } else {
-      alert('Could not upload avatar');
+      if (!res.ok) throw new Error('Could not upload avatar');
+      const data = await res.json();
+      toast.success('Avatar updated!');
+      setUser(prev => ({ ...prev, avatar_url: data.avatar_url }));
+    } catch (err) {
+      toast.error(err.message);
+      console.error('Avatar upload error:', err);
+    } finally {
+      setAvatarUploading(false);
     }
-    setAvatarUploading(false);
   };
 
   if (loading) return <div className="text-center mt-10">Loading...</div>;
-  if (!user) return <div className="text-center mt-10">User not found.</div>;
+  if (!user)   return <div className="text-center mt-10">User not found.</div>;
 
   return (
     <div className="max-w-2xl mx-auto mt-10 bg-white rounded shadow p-6">
@@ -133,6 +140,7 @@ function UserProfile() {
           @{user.username}
         </h2>
       </div>
+
       {isCurrentUser && editing ? (
         <form onSubmit={handleSubmit} className="space-y-4 mb-6">
           <div>
@@ -209,6 +217,7 @@ function UserProfile() {
           )}
         </>
       )}
+
       <h3 className="text-xl font-semibold mb-2">Posts by {user.username}:</h3>
       {posts.length === 0 ? (
         <p className="text-gray-500">No posts yet.</p>
