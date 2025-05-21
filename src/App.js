@@ -9,8 +9,6 @@ import TemperatureWidget from './components/TemperatureWidget';
 import Home from './pages/Home';
 import PostDetail from './pages/PostDetail';
 import UserProfile from './pages/UserProfile';
-import './App.css';
-import TemperatureWidget from './components/TemperatureWidget';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -47,12 +45,12 @@ function App() {
       localStorage.setItem('token', data.token);
       const profileRes = await fetch('/api/user/me', {
         headers: { Authorization: `Bearer ${data.token}` }
-      });
-      if (profileRes.ok) {
-        const profile = await profileRes.json();
-        setUser(profile.user);
-        localStorage.setItem('user', JSON.stringify(profile.user));
-      }
+      })
+        .then(res => res.json())
+        .then(profile => {
+          setUser(profile.user);
+          localStorage.setItem('user', JSON.stringify(profile.user));
+        });
     } else {
       throw new Error('Login failed');
     }
@@ -76,7 +74,7 @@ function App() {
     setUser(null);
   };
 
-    return (
+  return (
     <Router>
       <Toaster position="top-right" />
       <Navbar user={user} onLogout={handleLogout} />
