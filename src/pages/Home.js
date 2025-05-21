@@ -27,8 +27,8 @@ function Home() {
             fetch(`/api/posts/${post.id}/comments`),
             fetch(`/api/posts/${post.id}/like`)
           ]);
-          const comments = await commentsRes.json();
-          const likes = await likesRes.json();
+          const comments = await commentsRes.json().then(data => data.comments || []);
+          const likes = await likesRes.json().then(data => data.likes || []);
           return { ...post, comments, likesCount: Array.isArray(likes) ? likes.length : 0 };
         })
       );

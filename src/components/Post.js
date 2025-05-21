@@ -14,8 +14,7 @@ function Post({ post }) {
     const token = localStorage.getItem('token');
     const res = await fetch(`/api/posts/${post.id}/like`, {
       method: 'POST',
-      headers:
-      {
+      headers: {
         Authorization: `Bearer ${token}`,
       },
     });
@@ -39,18 +38,16 @@ function Post({ post }) {
     const token = localStorage.getItem('token');
     const res = await fetch(`/api/posts/${post.id}/comments`, {
       method: 'POST',
-      headers:
-      {
+      headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({ content: commentContent }),
     });
     if (res.ok) {
-      // Fetch updated comments
       const commentsRes = await fetch(`/api/posts/${post.id}/comments`);
       const newComments = await commentsRes.json();
-      setComments(newComments);
+      setComments(newComments.comments);
       setCommentContent('');
     } else if (res.status === 401) {
       alert('You must be logged in to comment.');
@@ -75,11 +72,7 @@ function Post({ post }) {
         )}
         {post.user_id ? (
           <Link
-            to={
-              post.user_id === (JSON.parse(localStorage.getItem('user') || '{}').id)
-                ? `/user/${post.user_id}`
-                : `/user/${post.user_id}`
-            }
+            to={`/user/${post.user_id}`}
             className="font-semibold text-blue-700 text-sm hover:underline"
           >
             @{post.username || 'user'}
@@ -106,7 +99,7 @@ function Post({ post }) {
       <div>
         {comments && comments.length > 0 && (
           <ul className="space-y-1 mb-2">
-            {comments.map(comment => (
+            {comments.map((comment) => (
               <li key={comment.id} className="text-xs text-gray-600 flex items-center gap-1">
                 {comment.avatar_url ? (
                   <img
@@ -134,7 +127,7 @@ function Post({ post }) {
               id={`comment-${post.id}`}
               type="text"
               value={commentContent}
-              onChange={e => setCommentContent(e.target.value)}
+              onChange={(e) => setCommentContent(e.target.value)}
               placeholder="Write a comment..."
               className="px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 text-base transition w-full"
               disabled={commentLoading}
