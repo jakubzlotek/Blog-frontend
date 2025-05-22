@@ -31,7 +31,8 @@ function UserProfile() {
       const postsRes = await fetch(`/api/posts?user_id=${id}`);
       if (postsRes.ok) {
         const postsData = await postsRes.json();
-        setPosts(postsData.posts.filter(p => p.user_id === Number(id)));
+        // postsData.posts already includes comments and likesCount
+        setPosts(Array.isArray(postsData.posts) ? postsData.posts.filter(p => p.user_id === Number(id)) : []);
       }
       setLoading(false);
     }
