@@ -5,85 +5,45 @@ import './App.css';
 import Login from './components/Login';
 import Navbar from './components/Navbar';
 import Register from './components/Register';
-import TemperatureWidget from './components/TemperatureWidget';
 import Home from './pages/Home';
 import PostDetail from './pages/PostDetail';
 import UserProfile from './pages/UserProfile';
+import BackendOffline from './components/BackendOffline';
 
 function App() {
   const [user, setUser] = useState(null);
+  const [backendOnline, setBackendOnline] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      fetch('/api/user/me', {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-        .then(res => {
-          if (!res.ok) throw new Error('Not authenticated');
-          return res.json();
-        })
-        .then(profile => {
-          setUser(profile.user);
-          localStorage.setItem('user', JSON.stringify(profile.user));
-        })
-        .catch(() => {
-          setUser(null);
-          localStorage.removeItem('user');
-        });
-    }
+    const checkBackend = async () => {
+      try {
+        const res = await fetch('/api/health');
+        if (!res.ok) throw new Error('Backend offline');
+        setBackendOnline(true);
+      } catch {
+        setBackendOnline(false);
+      }
+    };
+
+    checkBackend();
+    const interval = setInterval(checkBackend, 10000); // Check every 10 seconds
+    return () => clearInterval(interval);
   }, []);
 
-  const handleLogin = async (identifier, password) => {
-    const res = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ identifier, password })
-    });
-    if (res.ok) {
-      const data = await res.json();
-      localStorage.setItem('token', data.token);
-      const profileRes = await fetch('/api/user/me', {
-        headers: { Authorization: `Bearer ${data.token}` }
-      })
-        .then(res => res.json())
-        .then(profile => {
-          setUser(profile.user);
-          localStorage.setItem('user', JSON.stringify(profile.user));
-        });
-    } else {
-      throw new Error('Login failed');
-    }
-  };
-
-  const handleRegister = async (username, email, password) => {
-    const res = await fetch('/api/auth/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, email, password })
-    });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err.message || 'Registration failed');
-    }
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    setUser(null);
-  };
+  if (!backendOnline) {
+    return <BackendOffline />;
+  }
 
   return (
     <Router>
       <Toaster position="top-right" />
-      <Navbar user={user} onLogout={handleLogout} />
+      <Navbar user={user} onLogout={() => setUser(null)} />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/posts/:id" element={<PostDetail />} />
         <Route path="/user/:id" element={<UserProfile />} />
-        <Route path="/login" element={<Login onLogin={handleLogin} />} />
-        <Route path="/register" element={<Register onRegister={handleRegister} />} />
+        <Route path="/login" element={<Login onLogin={() => { }} />} />
+        <Route path="/register" element={<Register onRegister={() => { }} />} />
       </Routes>
     </Router>
   );
