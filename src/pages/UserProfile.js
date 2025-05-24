@@ -26,7 +26,7 @@ function UserProfile() {
       if (userRes.ok) {
         const userData = await userRes.json();
         setUser(userData.user);
-        setForm({ username: userData.username, email: userData.email, password: '' });
+        setForm({ username: userData.user.username, email: userData.user.email, password: '' });
       }
       const postsRes = await fetch(`/api/posts?user_id=${id}`);
       if (postsRes.ok) {
