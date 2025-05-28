@@ -59,10 +59,11 @@ function Home() {
       {user && (
         <NewPostForm onPostCreated={handlePostCreated} />
       )}
+      <Ads />
       <PostList posts={posts} lastPostRef={lastPostRef} />
       {loading && <div className="text-center my-4">Loading...</div>}
       {!hasMore && <div className="text-center my-4 text-gray-400">No more posts</div>}
-      <Ads />
+
     </div>
   );
 }
