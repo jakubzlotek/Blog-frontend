@@ -10,6 +10,7 @@ import PostDetail from './pages/PostDetail';
 import UserProfile from './pages/UserProfile';
 import BackendOffline from './components/BackendOffline';
 
+
 function App() {
   const [user, setUser] = useState(null);
   const [backendOnline, setBackendOnline] = useState(true);
