@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import PostList from '../components/PostList';
 import NewPostForm from '../components/NewPostForm';
 import TemperatureWidget from '../components/TemperatureWidget';
+import Ads from '../components/Ads';
 
 function Home() {
   const [posts, setPosts] = useState([]);
@@ -61,6 +62,7 @@ function Home() {
       <PostList posts={posts} lastPostRef={lastPostRef} />
       {loading && <div className="text-center my-4">Loading...</div>}
       {!hasMore && <div className="text-center my-4 text-gray-400">No more posts</div>}
+      <Ads />
     </div>
   );
 }
