@@ -95,7 +95,7 @@ function UserProfile() {
     });
     if (res.ok) {
       const updated = await res.json();
-      setUser(updated);
+      setUser(updated.user);
       setEditing(false);
     } else {
       alert('Could not update profile');
