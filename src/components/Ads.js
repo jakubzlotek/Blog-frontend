@@ -23,7 +23,7 @@ export default function Ads() {
       .then((res) => res.json())
       .then((data) => {
         const shuffled = shuffle(data);
-        setAds(shuffled.slice(0, 4));
+        setAds(shuffled.slice(0, 3));
         setLoading(false);
       });
   }, []);
