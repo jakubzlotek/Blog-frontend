@@ -1,12 +1,20 @@
-import React from 'react';
-import { FaUser, FaSignOutAlt, FaSignInAlt, FaUserPlus, FaHome } from 'react-icons/fa';
+import {
+  FaHome,
+  FaSignInAlt,
+  FaSignOutAlt,
+  FaUser,
+  FaUserPlus,
+} from "react-icons/fa";
 
 function Navbar({ user, onLogout }) {
   return (
     <nav className="bg-white shadow sticky top-0 z-10">
       <div className="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
         <div className="flex items-center space-x-6">
-          <a href="/" className="font-bold text-2xl text-blue-700 hover:text-blue-900 transition flex items-center gap-2">
+          <a
+            href="/"
+            className="font-bold text-2xl text-blue-700 hover:text-blue-900 transition flex items-center gap-2"
+          >
             <FaHome className="inline" /> Blog
           </a>
           {user && (
@@ -28,10 +36,16 @@ function Navbar({ user, onLogout }) {
             </button>
           ) : (
             <>
-              <a href="/login" className="text-gray-700 hover:text-blue-700 transition flex items-center gap-1">
+              <a
+                href="/login"
+                className="text-gray-700 hover:text-blue-700 transition flex items-center gap-1"
+              >
                 <FaSignInAlt /> Login
               </a>
-              <a href="/register" className="text-gray-700 hover:text-blue-700 transition flex items-center gap-1">
+              <a
+                href="/register"
+                className="text-gray-700 hover:text-blue-700 transition flex items-center gap-1"
+              >
                 <FaUserPlus /> Register
               </a>
             </>

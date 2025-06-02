@@ -1,6 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import {
+  FaCamera,
+  FaEdit,
+  FaEnvelope,
+  FaSave,
+  FaTimes,
+  FaUser,
+} from 'react-icons/fa';
 import { useParams } from 'react-router-dom';
-import { FaUser, FaEnvelope, FaEdit, FaSave, FaTimes, FaCamera } from 'react-icons/fa';
 import Post from '../components/Post';
 
 function UserProfile() {
@@ -9,35 +16,58 @@ function UserProfile() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // For editing
+  // Dla edycji profilu
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({ username: '', email: '', password: '' });
   const [editLoading, setEditLoading] = useState(false);
   const [avatarUploading, setAvatarUploading] = useState(false);
 
-  // Get current user id from localStorage
   const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
-  const isCurrentUser = currentUser && currentUser.id && String(currentUser.id) === id;
+  const isCurrentUser =
+    currentUser && currentUser.id && String(currentUser.id) === id;
 
+  // Fetch user info
   useEffect(() => {
-    async function fetchUserAndPosts() {
+    async function fetchUserData() {
       setLoading(true);
-      const userRes = await fetch(`/api/user/${id}`);
+      const userRes = await fetch(`/api/user/${id}`, { credentials: 'omit' });
       if (userRes.ok) {
         const userData = await userRes.json();
         setUser(userData.user);
-        setForm({ username: userData.user.username, email: userData.user.email, password: '' });
-      }
-      const postsRes = await fetch(`/api/posts?user_id=${id}`);
-      if (postsRes.ok) {
-        const postsData = await postsRes.json();
-        // postsData.posts already includes comments and likesCount
-        setPosts(Array.isArray(postsData.posts) ? postsData.posts.filter(p => p.user_id === Number(id)) : []);
+        setForm({
+          username: userData.user.username,
+          email: userData.user.email,
+          password: '',
+        });
       }
       setLoading(false);
     }
-    fetchUserAndPosts();
+    fetchUserData();
   }, [id]);
+
+  // Fetch posts tego użytkownika
+  const fetchUserPosts = useCallback(async () => {
+    try {
+      // Pobieramy wszystkie posty z backendu (zwraca { success: true, posts: [...] })
+      const postsRes = await fetch(`/api/posts?user_id=${id}`, {
+        credentials: 'omit'
+      });
+      if (postsRes.ok) {
+        const postsData = await postsRes.json();
+        const allPosts = Array.isArray(postsData.posts) ? postsData.posts : [];
+        // Dodatkowo upewniamy się, że filtrujemy po user_id
+        // (na wypadek, gdyby backend nie filtrował poprawnie)
+        const filtered = allPosts.filter(p => Number(p.user_id) === Number(id));
+        setPosts(filtered);
+      }
+    } catch (err) {
+      // ignorujemy w razie błędu
+    }
+  }, [id]);
+
+  useEffect(() => {
+    fetchUserPosts();
+  }, [fetchUserPosts]);
 
   const handleChange = e => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -58,9 +88,10 @@ function UserProfile() {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(form)
+      credentials: 'omit',
+      body: JSON.stringify(form),
     });
     if (res.ok) {
       const updated = await res.json();
@@ -72,7 +103,7 @@ function UserProfile() {
     setEditLoading(false);
   };
 
-  const handleAvatarChange = async (e) => {
+  const handleAvatarChange = async e => {
     const file = e.target.files[0];
     if (!file) return;
     setAvatarUploading(true);
@@ -84,6 +115,7 @@ function UserProfile() {
       headers: {
         Authorization: `Bearer ${token}`,
       },
+      credentials: 'omit',
       body: formData,
     });
     if (res.ok) {
@@ -97,6 +129,11 @@ function UserProfile() {
       alert('Could not upload avatar');
     }
     setAvatarUploading(false);
+  };
+
+  // Po usunięciu posta usuwamy go z listy lokalnie
+  const handlePostDeleted = postId => {
+    setPosts(prev => prev.filter(p => p.id !== postId));
   };
 
   if (loading) return <div className="text-center mt-10">Loading...</div>;
@@ -134,6 +171,7 @@ function UserProfile() {
           @{user.username}
         </h2>
       </div>
+
       {isCurrentUser && editing ? (
         <form onSubmit={handleSubmit} className="space-y-4 mb-6">
           <div>
@@ -210,13 +248,14 @@ function UserProfile() {
           )}
         </>
       )}
+
       <h3 className="text-xl font-semibold mb-2">Posts by {user.username}:</h3>
       {posts.length === 0 ? (
         <p className="text-gray-500">No posts yet.</p>
       ) : (
         posts.map(post => (
           <div key={post.id} className="mb-4">
-            <Post post={post} />
+            <Post post={post} onDelete={handlePostDeleted} />
           </div>
         ))
       )}
