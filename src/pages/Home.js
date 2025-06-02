@@ -1,8 +1,8 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
-import PostList from '../components/PostList';
-import NewPostForm from '../components/NewPostForm';
-import TemperatureWidget from '../components/TemperatureWidget';
-import Ads from '../components/Ads';
+import { useCallback, useEffect, useRef, useState } from "react";
+import Ads from "../components/Ads";
+import NewPostForm from "../components/NewPostForm";
+import PostList from "../components/PostList";
+import TemperatureWidget from "../components/TemperatureWidget";
 
 function Home() {
   const [posts, setPosts] = useState([]);
@@ -10,18 +10,19 @@ function Home() {
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
   const observer = useRef();
-
-  const user = localStorage.getItem('token');
+  const [reloadFlag, setReloadFlag] = useState(false);
 
   const fetchPosts = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/posts?page=${page}&limit=10`);
+      // Relatywny URL – dzięki "proxy" trafi na http://localhost:3000/api/posts
+      const res = await fetch(`/api/posts?page=${page}&limit=10`, {
+        credentials: "omit",
+      });
+      if (!res.ok) throw new Error("fetch error");
       const data = await res.json();
-
-      // Ensure data is always an array
-      const postsArray = Array.isArray(data) ? data : Array.isArray(data.posts) ? data.posts : [];
-      setPosts(prev => [...prev, ...postsArray]);
+      const postsArray = Array.isArray(data.posts) ? data.posts : [];
+      setPosts((prev) => (page === 1 ? postsArray : [...prev, ...postsArray]));
       setHasMore(postsArray.length === 10);
     } catch (error) {
       setHasMore(false);
@@ -31,39 +32,50 @@ function Home() {
 
   useEffect(() => {
     fetchPosts();
-  }, [fetchPosts]);
+  }, [fetchPosts, reloadFlag]);
 
-  // Infinite scroll observer
-  const lastPostRef = useCallback(node => {
-    if (loading) return;
-    if (observer.current) observer.current.disconnect();
-    observer.current = new window.IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && hasMore) {
-        setPage(prev => prev + 1);
-      }
-    });
-    if (node) observer.current.observe(node);
-  }, [loading, hasMore]);
+  const lastPostRef = useCallback(
+    (node) => {
+      if (loading) return;
+      if (observer.current) observer.current.disconnect();
+      observer.current = new window.IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          setPage((prev) => prev + 1);
+        }
+      });
+      if (node) observer.current.observe(node);
+    },
+    [loading, hasMore]
+  );
 
-  // Reset posts when a new post is created
   const handlePostCreated = () => {
     setPosts([]);
     setPage(1);
     setHasMore(true);
+    setReloadFlag((prev) => !prev);
+  };
+
+  const handlePostDeleted = (postId) => {
+    setPosts((prev) => prev.filter((p) => p.id !== postId));
   };
 
   return (
     <div className="max-w-2xl mx-auto mt-8">
       <h1 className="text-3xl font-bold mb-6 text-center">Blog Home</h1>
       <TemperatureWidget />
-      {user && (
+      {localStorage.getItem("token") && (
         <NewPostForm onPostCreated={handlePostCreated} />
       )}
       <Ads />
-      <PostList posts={posts} lastPostRef={lastPostRef} />
+      <PostList
+        posts={posts}
+        lastPostRef={lastPostRef}
+        onDelete={handlePostDeleted}
+      />
       {loading && <div className="text-center my-4">Loading...</div>}
-      {!hasMore && <div className="text-center my-4 text-gray-400">No more posts</div>}
-
+      {!hasMore && !loading && (
+        <div className="text-center my-4 text-gray-400">No more posts</div>
+      )}
     </div>
   );
 }

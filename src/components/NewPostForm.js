@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { FaPen, FaAlignLeft, FaPaperPlane } from 'react-icons/fa';
+import { useState } from 'react';
+import { FaPaperPlane, FaPen } from 'react-icons/fa';
 
 function NewPostForm({ onPostCreated }) {
   const [title, setTitle] = useState('');
@@ -39,7 +39,9 @@ function NewPostForm({ onPostCreated }) {
         <h3 className="text-xl font-bold text-blue-800 mb-2 flex items-center gap-2">
           <FaPen /> Create a New Post
         </h3>
-        <p className="text-xs text-gray-500 mb-2">Share your thoughts with the community.</p>
+        <p className="text-xs text-gray-500 mb-2">
+          Share your thoughts with the community.
+        </p>
       </div>
       <div className="flex items-center gap-2">
         <input
