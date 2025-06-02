@@ -9,6 +9,7 @@ import {
 } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { toast } from 'react-hot-toast';
+import { authFetch } from '../api/authFetch';
 
 function Post({ post, onDelete }) {
   const [likesCount, setLikesCount] = useState(post.likesCount || 0);
@@ -35,11 +36,11 @@ function Post({ post, onDelete }) {
     if (liked) return;
     const token = localStorage.getItem("token");
     if (!token) {
-      alert("You must be logged in to like posts.");
+      toast.error("You must be logged in to like posts.");
       return;
     }
     try {
-      const res = await fetch(`/api/posts/${post.id}/like`, {
+      const res = await authFetch(`/api/posts/${post.id}/like`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -53,12 +54,12 @@ function Post({ post, onDelete }) {
       } else if (res.status === 409) {
         setLiked(true);
       } else if (res.status === 401) {
-        alert("You must be logged in to like posts.");
+        toast.error("You must be logged in to like posts.");
       } else {
-        alert("Could not like post.");
+        toast.error("Could not like post.");
       }
     } catch {
-      alert("Network error.");
+      toast.error("Network error.");
     }
   };
 
@@ -72,7 +73,7 @@ function Post({ post, onDelete }) {
     }
     setCommentLoading(true);
     try {
-      const res = await fetch(`/api/posts/${post.id}/comments`, {
+      const res = await authFetch(`/api/posts/${post.id}/comments`, { // ← use authFetch
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -116,7 +117,7 @@ function Post({ post, onDelete }) {
     }
     setDeleteLoading(true);
     try {
-      const res = await fetch(`/api/posts/${post.id}`, {
+      const res = await authFetch(`/api/posts/${post.id}`, { // ← use authFetch
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,

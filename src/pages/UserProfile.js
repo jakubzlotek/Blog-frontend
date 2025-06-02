@@ -9,6 +9,8 @@ import {
 } from 'react-icons/fa';
 import { useParams } from 'react-router-dom';
 import Post from '../components/Post';
+import { toast } from 'react-hot-toast';
+import { authFetch } from '../api/authFetch';
 
 function UserProfile() {
   const { id } = useParams();
@@ -84,7 +86,7 @@ function UserProfile() {
     e.preventDefault();
     setEditLoading(true);
     const token = localStorage.getItem('token');
-    const res = await fetch('/api/user/me', {
+    const res = await authFetch('/api/user/me', {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -97,8 +99,9 @@ function UserProfile() {
       const updated = await res.json();
       setUser(updated.user);
       setEditing(false);
+      toast.success('Profile updated!');
     } else {
-      alert('Could not update profile');
+      toast.error('Could not update profile');
     }
     setEditLoading(false);
   };
@@ -110,7 +113,7 @@ function UserProfile() {
     const formData = new FormData();
     formData.append('avatar', file);
     const token = localStorage.getItem('token');
-    const res = await fetch('/api/user/me/avatar', {
+    const res = await authFetch('/api/user/me/avatar', {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -125,8 +128,9 @@ function UserProfile() {
         localStorage.setItem('user', JSON.stringify(updatedUser));
         return updatedUser;
       });
+      toast.success('Avatar updated!');
     } else {
-      alert('Could not upload avatar');
+      toast.error('Could not upload avatar');
     }
     setAvatarUploading(false);
   };
