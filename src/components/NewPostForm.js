@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { FaPaperPlane, FaPen } from 'react-icons/fa';
+import { toast } from 'react-hot-toast';
 
 function NewPostForm({ onPostCreated }) {
   const [title, setTitle] = useState('');
@@ -21,11 +22,12 @@ function NewPostForm({ onPostCreated }) {
     if (res.ok) {
       setTitle('');
       setContent('');
+      toast.success('Post created!');
       onPostCreated && onPostCreated();
     } else if (res.status === 401) {
-      alert('You must be logged in to add posts.');
+      toast.error('You must be logged in to add posts.');
     } else {
-      alert('Could not add post.');
+      toast.error('Could not add post.');
     }
     setLoading(false);
   };

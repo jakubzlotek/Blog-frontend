@@ -8,6 +8,7 @@ import {
   FaUser,
 } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import { toast } from 'react-hot-toast';
 
 function Post({ post, onDelete }) {
   const [likesCount, setLikesCount] = useState(post.likesCount || 0);
@@ -21,7 +22,12 @@ function Post({ post, onDelete }) {
 
   useEffect(() => {
     setLikesCount(post.likesCount || 0);
-    setLiked(post.likedByCurrentUser || false);
+    // Use likedUserIds if available
+    const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
+    const liked = Array.isArray(post.likedUserIds)
+      ? post.likedUserIds.includes(currentUser.id)
+      : post.likedByCurrentUser || false;
+    setLiked(liked);
     setComments(Array.isArray(post.comments) ? post.comments : []);
   }, [post]);
 
@@ -43,6 +49,7 @@ function Post({ post, onDelete }) {
       if (res.ok) {
         setLikesCount((prev) => prev + 1);
         setLiked(true);
+        toast.success('Post liked!');
       } else if (res.status === 409) {
         setLiked(true);
       } else if (res.status === 401) {
@@ -60,7 +67,7 @@ function Post({ post, onDelete }) {
     if (!commentContent.trim()) return;
     const token = localStorage.getItem("token");
     if (!token) {
-      alert("You must be logged in to comment.");
+      toast.error("You must be logged in to comment.");
       return;
     }
     setCommentLoading(true);
@@ -87,13 +94,14 @@ function Post({ post, onDelete }) {
           );
         }
         setCommentContent("");
+        toast.success("Comment added!");
       } else if (res.status === 401) {
-        alert("You must be logged in to comment.");
+        toast.error("You must be logged in to comment.");
       } else {
-        alert("Could not add comment.");
+        toast.error("Could not add comment.");
       }
     } catch {
-      alert("Network error.");
+      toast.error("Network error.");
     }
     setCommentLoading(false);
   };
@@ -103,7 +111,7 @@ function Post({ post, onDelete }) {
       return;
     const token = localStorage.getItem("token");
     if (!token) {
-      alert("You must be logged in to delete your post.");
+      toast.error("You must be logged in to delete your post.");
       return;
     }
     setDeleteLoading(true);
@@ -116,14 +124,15 @@ function Post({ post, onDelete }) {
         credentials: "omit",
       });
       if (res.ok) {
+        toast.success("Post deleted!");
         onDelete && onDelete(post.id);
       } else if (res.status === 403) {
-        alert("You are not allowed to delete this post.");
+        toast.error("You are not allowed to delete this post.");
       } else {
-        alert("Could not delete post.");
+        toast.error("Could not delete post.");
       }
     } catch {
-      alert("Network error.");
+      toast.error("Network error.");
     }
     setDeleteLoading(false);
   };
@@ -149,7 +158,7 @@ function Post({ post, onDelete }) {
             to={`/user/${post.user_id}`}
             className="font-semibold text-blue-700 text-sm hover:underline"
           >
-            @{post.username || "user"}
+            {post.username || "user"}
           </Link>
           <span className="text-xs text-gray-400">
             {new Date(post.created_at).toLocaleString()}
@@ -172,11 +181,10 @@ function Post({ post, onDelete }) {
         <button
           onClick={handleLike}
           disabled={liked}
-          className={`flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold ${
-            liked
-              ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-              : "bg-blue-100 text-blue-700 hover:bg-blue-200"
-          }`}
+          className={`flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold ${liked
+            ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+            : "bg-blue-100 text-blue-700 hover:bg-blue-200"
+            }`}
         >
           <FaThumbsUp /> {likesCount} {liked ? "Liked" : "Like"}
         </button>

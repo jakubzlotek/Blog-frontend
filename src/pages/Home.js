@@ -60,22 +60,28 @@ function Home() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto mt-8">
-      <h1 className="text-3xl font-bold mb-6 text-center">Blog Home</h1>
-      <TemperatureWidget />
-      {localStorage.getItem("token") && (
-        <NewPostForm onPostCreated={handlePostCreated} />
-      )}
-      <Ads />
-      <PostList
-        posts={posts}
-        lastPostRef={lastPostRef}
-        onDelete={handlePostDeleted}
-      />
-      {loading && <div className="text-center my-4">Loading...</div>}
-      {!hasMore && !loading && (
-        <div className="text-center my-4 text-gray-400">No more posts</div>
-      )}
+    <div className="max-w-6xl mx-auto mt-8 flex flex-col lg:flex-row gap-8">
+      {/* Sidebar with ads on the left */}
+      <aside className="w-full lg:w-72 flex-shrink-0 order-2 lg:order-1">
+        <Ads />
+      </aside>
+      {/* Main content */}
+      <div className="flex-1 min-w-0 order-1 lg:order-2">
+        <h1 className="text-3xl font-bold mb-6 text-center">Blog Home</h1>
+        <TemperatureWidget />
+        {localStorage.getItem("token") && (
+          <NewPostForm onPostCreated={handlePostCreated} />
+        )}
+        <PostList
+          posts={posts}
+          lastPostRef={lastPostRef}
+          onDelete={handlePostDeleted}
+        />
+        {loading && <div className="text-center my-4">Loading...</div>}
+        {!hasMore && !loading && (
+          <div className="text-center my-4 text-gray-400">No more posts</div>
+        )}
+      </div>
     </div>
   );
 }

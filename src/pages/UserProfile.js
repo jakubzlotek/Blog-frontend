@@ -168,7 +168,7 @@ function UserProfile() {
           )}
         </div>
         <h2 className="text-2xl font-bold flex items-center gap-2">
-          @{user.username}
+          {user.username}
         </h2>
       </div>
 
