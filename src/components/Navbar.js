@@ -35,7 +35,7 @@ function Navbar({ user, onLogout }) {
             href="/"
             className="font-bold text-2xl text-blue-700 hover:text-blue-900 transition flex items-center gap-2"
           >
-            <FaHome className="inline" /> Blog
+           🦒 SuperBlog
           </a>
           {/* Desktop links */}
         </div>

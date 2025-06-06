@@ -67,7 +67,6 @@ function Home() {
       </aside>
       {/* Main content */}
       <div className="flex-1 min-w-0 order-1 lg:order-2">
-        <h1 className="text-3xl font-bold mb-6 text-center">Blog Home</h1>
         <TemperatureWidget />
         {localStorage.getItem("token") && (
           <NewPostForm onPostCreated={handlePostCreated} />
