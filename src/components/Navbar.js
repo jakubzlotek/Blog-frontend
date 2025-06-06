@@ -10,7 +10,7 @@ import {
   FaBars,
   FaTimes,
 } from "react-icons/fa";
-import { getAvatarUrl } from '../utils/avatarUrl';
+import { getAvatarUrl } from '../api/apliClient';
 
 function Navbar({ user, onLogout }) {
   const [search, setSearch] = useState("");
