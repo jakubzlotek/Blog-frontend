@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { FaPaperPlane, FaPen } from 'react-icons/fa';
 import { toast } from 'react-hot-toast';
-import { authFetch } from '../api/authFetch'; // ← add this import
+import { authFetch } from '../api/apiClient'; // ← add this import
 
 function NewPostForm({ onPostCreated }) {
   const [title, setTitle] = useState('');

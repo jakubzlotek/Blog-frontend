@@ -3,7 +3,7 @@ import Ads from "../components/Ads";
 import NewPostForm from "../components/NewPostForm";
 import PostList from "../components/PostList";
 import TemperatureWidget from "../components/TemperatureWidget";
-import { apiFetch } from "../api/authFetch"; // Add this import
+import { apiFetch } from "../api/apiClient"; // Add this import
 
 function Home() {
   const [posts, setPosts] = useState([]);

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { apiFetch } from "../api/authFetch"; // Add this import
+import { apiFetch } from "../api/apiClient"; // Add this import
 
 function shuffle(array) {
   // Fisher-Yates shuffle

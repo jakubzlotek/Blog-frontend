@@ -10,7 +10,7 @@ import {
 import { useParams } from 'react-router-dom';
 import Post from '../components/Post';
 import { toast } from 'react-hot-toast';
-import { authFetch, apiFetch } from '../api/authFetch';
+import { authFetch, apiFetch } from '../api/apiClient';
 import { getAvatarUrl } from '../utils/avatarUrl';
 
 function UserProfile() {

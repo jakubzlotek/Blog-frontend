@@ -10,7 +10,7 @@ import {
 import { FaXTwitter } from "react-icons/fa6"; // Add this import at the top with other imports
 import { Link } from "react-router-dom";
 import { toast } from 'react-hot-toast';
-import { authFetch, apiFetch } from '../api/authFetch';
+import { authFetch, apiFetch } from '../api/apiClient';
 import { getAvatarUrl } from '../utils/avatarUrl';
 
 function Post({ post, onDelete }) {

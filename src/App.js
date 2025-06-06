@@ -10,7 +10,7 @@ import Home from "./pages/Home";
 import PostDetail from "./pages/PostDetail";
 import UserProfile from "./pages/UserProfile";
 import SearchResults from "./pages/SearchResults";
-import { apiFetch } from "./api/authFetch"; // Add this import
+import { apiFetch } from "./api/apiClient"; // Add this import
 
 function App() {
   const [user, setUser] = useState(null);

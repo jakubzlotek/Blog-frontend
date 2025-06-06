@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import PostList from "../components/PostList";
-import { apiFetch } from "../api/authFetch"; // Add this import
+import { apiFetch } from "../api/apiClient"; // Add this import
 
 function useQuery() {
   return new URLSearchParams(useLocation().search);

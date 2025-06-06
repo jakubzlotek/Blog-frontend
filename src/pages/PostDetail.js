@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Post from "../components/Post";
-import { apiFetch } from "../api/authFetch"; // add this import
+import { apiFetch } from "../api/apiClient"; // add this import
 
 function PostDetail() {
   const { id } = useParams();
