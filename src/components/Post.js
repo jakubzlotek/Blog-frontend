@@ -7,6 +7,7 @@ import {
   FaTrashAlt,
   FaUser,
 } from "react-icons/fa";
+import { FaXTwitter } from "react-icons/fa6"; // Add this import at the top with other imports
 import { Link } from "react-router-dom";
 import { toast } from 'react-hot-toast';
 import { authFetch } from '../api/authFetch';
@@ -20,6 +21,7 @@ function Post({ post, onDelete }) {
   const [commentContent, setCommentContent] = useState("");
   const [commentLoading, setCommentLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [showCommentBox, setShowCommentBox] = useState(false);
 
   useEffect(() => {
     setLikesCount(post.likesCount || 0);
@@ -176,19 +178,35 @@ function Post({ post, onDelete }) {
           </button>
         )}
       </div>
-      <div className="text-base font-medium mb-1">{post.title}</div>
+      <Link
+        to={`/posts/${post.id}`}
+        className="block text-xl font-bold text-blue-800 hover:underline mb-1 transition"
+        title={post.title}
+      >
+        {post.title}
+      </Link>
       <div className="text-sm text-gray-700 mb-2">{post.content}</div>
       <div className="flex items-center gap-4 mb-2">
         <button
           onClick={handleLike}
           disabled={liked}
-          className={`flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold ${liked
-            ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-            : "bg-blue-100 text-blue-700 hover:bg-blue-200"
-            }`}
+          className={`flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold ${
+            liked
+              ? "bg-green-100 text-green-700 border border-green-400 cursor-not-allowed"
+              : "bg-blue-100 text-blue-700 hover:bg-blue-200"
+          }`}
         >
           <FaThumbsUp /> {likesCount} {liked ? "Liked" : "Like"}
         </button>
+        <a
+          href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(post.title + ' - ' + post.content)}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="bg-black text-white px-3 py-1 rounded text-xs font-semibold hover:bg-gray-900 transition flex items-center gap-2"
+        >
+          <FaXTwitter className="text-lg" />
+          Share on X
+        </a>
       </div>
       <div>
         {comments && comments.length > 0 && (
@@ -215,37 +233,45 @@ function Post({ post, onDelete }) {
             ))}
           </ul>
         )}
-        <form
-          onSubmit={handleCommentSubmit}
-          className="flex gap-2 mt-2 items-end"
+                      <button
+          onClick={() => setShowCommentBox((prev) => !prev)}
+          className=" text-gray-700 py-1 px-1 rounded text-xs font-semibold hover:bg-gray-300 transition"
         >
-          <div className="flex-1 flex flex-col gap-1">
-            <label
-              htmlFor={`comment-${post.id}`}
-              className="text-sm font-semibold flex items-center gap-1"
-            >
-              <FaReply /> Add a comment
-            </label>
-            <input
-              id={`comment-${post.id}`}
-              type="text"
-              value={commentContent}
-              onChange={(e) => setCommentContent(e.target.value)}
-              placeholder="Write a comment..."
-              className="px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 text-base transition w-full"
-              disabled={commentLoading}
-              style={{ minHeight: "38px", height: "38px" }}
-            />
-          </div>
-          <button
-            type="submit"
-            className="bg-green-500 text-white px-4 py-2 rounded-md text-base font-semibold hover:bg-green-600 transition flex items-center gap-1"
-            disabled={commentLoading}
-            style={{ height: "38px", minHeight: "38px" }}
+          {showCommentBox ? "Click to abort reply" : "Click to post your reply"}
+        </button>
+        {showCommentBox && (
+          <form
+            onSubmit={handleCommentSubmit}
+            className="flex gap-2 mt-2 items-end"
           >
-            <FaPaperPlane /> {commentLoading ? "..." : "Reply"}
-          </button>
-        </form>
+            <div className="flex-1 flex flex-col gap-1">
+              <label
+                htmlFor={`comment-${post.id}`}
+                className="text-sm font-semibold flex items-center gap-1"
+              >
+                <FaReply /> Add a comment
+              </label>
+              <input
+                id={`comment-${post.id}`}
+                type="text"
+                value={commentContent}
+                onChange={(e) => setCommentContent(e.target.value)}
+                placeholder="Write a comment..."
+                className="px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 text-base transition w-full"
+                disabled={commentLoading}
+                style={{ minHeight: "38px", height: "38px" }}
+              />
+            </div>
+            <button
+              type="submit"
+              className="bg-green-500 text-white px-4 py-2 rounded-md text-base font-semibold hover:bg-green-600 transition flex items-center gap-1"
+              disabled={commentLoading}
+              style={{ height: "38px", minHeight: "38px" }}
+            >
+              <FaPaperPlane /> {commentLoading ? "..." : "Reply"}
+            </button>
+          </form>
+        )}
       </div>
     </div>
   );
