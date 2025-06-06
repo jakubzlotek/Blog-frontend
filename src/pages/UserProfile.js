@@ -11,6 +11,7 @@ import { useParams } from 'react-router-dom';
 import Post from '../components/Post';
 import { toast } from 'react-hot-toast';
 import { authFetch, apiFetch } from '../api/authFetch';
+import { getAvatarUrl } from '../utils/avatarUrl';
 
 function UserProfile() {
   const { id } = useParams();
@@ -153,7 +154,7 @@ function UserProfile() {
         <div className="relative">
           {user.avatar_url ? (
             <img
-              src={user.avatar_url}
+              src={getAvatarUrl(user.avatar_url)}
               alt="avatar"
               className="w-20 h-20 rounded-full object-cover border border-gray-300"
             />

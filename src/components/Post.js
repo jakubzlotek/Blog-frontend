@@ -11,6 +11,7 @@ import { FaXTwitter } from "react-icons/fa6"; // Add this import at the top with
 import { Link } from "react-router-dom";
 import { toast } from 'react-hot-toast';
 import { authFetch, apiFetch } from '../api/authFetch';
+import { getAvatarUrl } from '../utils/avatarUrl';
 
 function Post({ post, onDelete }) {
   const [likesCount, setLikesCount] = useState(post.likesCount || 0);
@@ -148,7 +149,7 @@ function Post({ post, onDelete }) {
         <div className="flex items-center gap-2">
           {post.avatar_url ? (
             <img
-              src={post.avatar_url}
+              src={getAvatarUrl(post.avatar_url)}
               alt="avatar"
               className="w-7 h-7 rounded-full object-cover border border-gray-300"
             />
@@ -216,7 +217,7 @@ function Post({ post, onDelete }) {
               >
                 {comment.avatar_url ? (
                   <img
-                    src={comment.avatar_url}
+                    src={getAvatarUrl(comment.avatar_url)}
                     alt="avatar"
                     className="w-5 h-5 rounded-full object-cover border border-gray-200"
                   />

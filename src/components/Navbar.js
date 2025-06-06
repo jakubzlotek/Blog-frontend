@@ -10,6 +10,7 @@ import {
   FaBars,
   FaTimes,
 } from "react-icons/fa";
+import { getAvatarUrl } from '../utils/avatarUrl';
 
 function Navbar({ user, onLogout }) {
   const [search, setSearch] = useState("");
@@ -69,7 +70,7 @@ function Navbar({ user, onLogout }) {
               >
                 {user.avatar_url ? (
                   <img
-                    src={user.avatar_url}
+                    src={getAvatarUrl(user.avatar_url)}
                     alt="avatar"
                     className="w-7 h-7 rounded-full object-cover border border-blue-200"
                   />
@@ -144,7 +145,7 @@ function Navbar({ user, onLogout }) {
               >
                 {user.avatar_url ? (
                   <img
-                    src={user.avatar_url}
+                    src={getAvatarUrl(user.avatar_url)}
                     alt="avatar"
                     className="w-7 h-7 rounded-full object-cover border border-blue-200"
                   />
