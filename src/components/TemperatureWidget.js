@@ -6,41 +6,36 @@ export default function TemperatureWidget() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!navigator.geolocation) {
-      setError('Twoja przeglądarka nie wspiera geolokalizacji');
-      setLoading(false);
-      return;
+    async function fetchWeatherByIP() {
+      try {
+        // 1. Get user's IP address
+        const ipRes = await fetch('https://api.ipify.org?format=json');
+        if (!ipRes.ok) throw new Error('Nie udało się pobrać IP');
+        const { ip } = await ipRes.json();
+
+        // 2. Geolocate IP
+        const geoRes = await fetch(`https://ipapi.co/${ip}/json/`);
+        if (!geoRes.ok) throw new Error('Nie udało się pobrać lokalizacji');
+        const geo = await geoRes.json();
+        const { latitude, longitude } = geo;
+        if (!latitude || !longitude) throw new Error('Brak współrzędnych lokalizacji');
+
+        // 3. Fetch weather
+        const url = `http://wttr.in/${latitude},${longitude}?format=%t`;
+        const weatherRes = await fetch(url);
+        if (!weatherRes.ok) throw new Error('Błąd podczas pobierania pogody');
+        const data = await weatherRes.text();
+        const temperature = data.replace('+', '').replace('°C', '').trim();
+        setTemp(temperature);
+      } catch (err) {
+        console.error(err);
+        setError('Nie udało się pobrać pogody na podstawie IP');
+      } finally {
+        setLoading(false);
+      }
     }
 
-    navigator.geolocation.getCurrentPosition(
-      ({ coords }) => {
-        const { latitude, longitude } = coords;
-        const url = `http://wttr.in/${latitude},${longitude}?format=%t`;
-
-        fetch(url)
-          .then(res => {
-            if (!res.ok) throw new Error('Błąd podczas pobierania pogody');
-            return res.text();
-          })
-          .then(data => {
-            const temperature = data.replace('+', '').replace('°C', '').trim();
-            setTemp(temperature);
-          })
-          .catch(err => {
-            console.error(err);
-            setError('Nie udało się pobrać pogody');
-          })
-          .finally(() => {
-            setLoading(false);
-          });
-      },
-      (geoErr) => {
-        console.error(geoErr);
-        setError('Brak pozwolenia na dostęp do lokalizacji');
-        setLoading(false);
-      },
-      { enableHighAccuracy: true, timeout: 10000 }
-    );
+    fetchWeatherByIP();
   }, []);
 
   const getEmojiForTemperature = (temperature) => {
