@@ -52,7 +52,7 @@ function UserProfile() {
   const fetchUserPosts = useCallback(async () => {
     try {
       // Pobieramy wszystkie posty z backendu (zwraca { success: true, posts: [...] })
-      const postsRes = await fetch(`/api/posts?user_id=${id}`, {
+      const postsRes = await apiFetch(`/api/posts?user_id=${id}`, {
         credentials: 'omit'
       });
       if (postsRes.ok) {
