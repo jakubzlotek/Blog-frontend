@@ -1,5 +1,5 @@
-// ...existing code...
 import { useEffect, useState } from "react";
+import { apiFetch } from "../api/authFetch"; // Add this import
 
 function shuffle(array) {
   // Fisher-Yates shuffle
@@ -19,7 +19,7 @@ export default function Ads() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/ads?limit=20") // Adjust limit as needed
+    apiFetch("/api/ads?limit=20")
       .then((res) => res.json())
       .then((data) => {
         const shuffled = shuffle(data);
@@ -67,4 +67,3 @@ export default function Ads() {
     </div>
   );
 }
-// ...existing code...

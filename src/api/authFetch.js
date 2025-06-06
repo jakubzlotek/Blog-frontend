@@ -1,9 +1,11 @@
 // Authenticated fetch with automatic JWT refresh
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
 async function refreshToken() {
   const token = localStorage.getItem('token');
   if (!token) throw new Error('No token to refresh');
-  const res = await fetch('/api/auth/refresh', {
+  const res = await fetch(`${API_BASE_URL}/api/auth/refresh`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${token}` },
     credentials: 'omit'
@@ -39,4 +41,13 @@ export async function authFetch(url, options = {}, retry = true) {
     }
   }
   return res;
+}
+
+export async function apiFetch(path, options = {}) {
+  const url = path.startsWith("/")
+    ? `${API_BASE_URL}${path}`
+    : `${API_BASE_URL}/${path}`;
+  // Default: no credentials
+  options.credentials = options.credentials || "omit";
+  return fetch(url, options);
 }

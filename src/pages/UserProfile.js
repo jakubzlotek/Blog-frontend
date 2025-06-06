@@ -10,7 +10,7 @@ import {
 import { useParams } from 'react-router-dom';
 import Post from '../components/Post';
 import { toast } from 'react-hot-toast';
-import { authFetch } from '../api/authFetch';
+import { authFetch, apiFetch } from '../api/authFetch';
 
 function UserProfile() {
   const { id } = useParams();
@@ -32,7 +32,7 @@ function UserProfile() {
   useEffect(() => {
     async function fetchUserData() {
       setLoading(true);
-      const userRes = await fetch(`/api/user/${id}`, { credentials: 'omit' });
+      const userRes = await apiFetch(`/api/user/${id}`);
       if (userRes.ok) {
         const userData = await userRes.json();
         setUser(userData.user);

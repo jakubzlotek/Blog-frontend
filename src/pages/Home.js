@@ -3,6 +3,7 @@ import Ads from "../components/Ads";
 import NewPostForm from "../components/NewPostForm";
 import PostList from "../components/PostList";
 import TemperatureWidget from "../components/TemperatureWidget";
+import { apiFetch } from "../api/authFetch"; // Add this import
 
 function Home() {
   const [posts, setPosts] = useState([]);
@@ -15,10 +16,7 @@ function Home() {
   const fetchPosts = useCallback(async () => {
     setLoading(true);
     try {
-      // Relatywny URL – dzięki "proxy" trafi na http://localhost:3000/api/posts
-      const res = await fetch(`/api/posts?page=${page}&limit=10`, {
-        credentials: "omit",
-      });
+      const res = await apiFetch(`/api/posts?page=${page}&limit=10`);
       if (!res.ok) throw new Error("fetch error");
       const data = await res.json();
       const postsArray = Array.isArray(data.posts) ? data.posts : [];

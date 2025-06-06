@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import PostList from "../components/PostList";
+import { apiFetch } from "../api/authFetch"; // Add this import
 
 function useQuery() {
   return new URLSearchParams(useLocation().search);
@@ -14,7 +15,7 @@ export default function SearchResults() {
   useEffect(() => {
     if (!query) return;
     setLoading(true);
-    fetch(`/api/posts/search?query=${encodeURIComponent(query)}`)
+    apiFetch(`/api/posts/search?query=${encodeURIComponent(query)}`)
       .then((res) => res.json())
       .then((data) => setPosts(data.posts || []))
       .finally(() => setLoading(false));

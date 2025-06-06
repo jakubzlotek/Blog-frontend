@@ -10,7 +10,7 @@ import {
 import { FaXTwitter } from "react-icons/fa6"; // Add this import at the top with other imports
 import { Link } from "react-router-dom";
 import { toast } from 'react-hot-toast';
-import { authFetch } from '../api/authFetch';
+import { authFetch, apiFetch } from '../api/authFetch';
 
 function Post({ post, onDelete }) {
   const [likesCount, setLikesCount] = useState(post.likesCount || 0);
@@ -85,9 +85,7 @@ function Post({ post, onDelete }) {
         body: JSON.stringify({ content: commentContent }),
       });
       if (res.ok) {
-        const commentsRes = await fetch(`/api/posts/${post.id}/comments`, {
-          credentials: "omit",
-        });
+        const commentsRes = await apiFetch(`/api/posts/${post.id}/comments`);
         if (commentsRes.ok) {
           const newCommentsData = await commentsRes.json();
           setComments(

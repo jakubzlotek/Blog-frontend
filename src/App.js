@@ -9,17 +9,17 @@ import Register from "./components/Register";
 import Home from "./pages/Home";
 import PostDetail from "./pages/PostDetail";
 import UserProfile from "./pages/UserProfile";
-import SearchResults from "./pages/SearchResults"; // Add this import
+import SearchResults from "./pages/SearchResults";
+import { apiFetch } from "./api/authFetch"; // Add this import
 
 function App() {
   const [user, setUser] = useState(null);
   const [backendOnline, setBackendOnline] = useState(true);
 
   const onRegister = async (username, email, password) => {
-    const res = await fetch("/api/auth/register", {
+    const res = await apiFetch("/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      credentials: "omit", // ← bez ciasteczek
       body: JSON.stringify({ username, email, password }),
     });
     if (!res.ok) {
@@ -30,10 +30,9 @@ function App() {
   };
 
   const onLogin = async (identifier, password) => {
-    const res = await fetch("/api/auth/login", {
+    const res = await apiFetch("/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      credentials: "omit",
       body: JSON.stringify({ identifier, password }),
     });
     if (!res.ok) {
@@ -63,7 +62,7 @@ function App() {
   useEffect(() => {
     const checkBackend = async () => {
       try {
-        const res = await fetch("/api/health", { credentials: "omit" });
+        const res = await apiFetch("/api/health");
         if (!res.ok) throw new Error("Backend offline");
         setBackendOnline(true);
       } catch {
@@ -95,7 +94,7 @@ function App() {
         <Route path="/user/:id" element={<UserProfile />} />
         <Route path="/login" element={<Login onLogin={onLogin} />} />
         <Route path="/register" element={<Register onRegister={onRegister} />} />
-        <Route path="/search" element={<SearchResults />} /> {/* Add this line */}
+        <Route path="/search" element={<SearchResults />} />
       </Routes>
     </Router>
   );

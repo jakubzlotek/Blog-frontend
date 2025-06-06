@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Post from "../components/Post";
+import { apiFetch } from "../api/authFetch"; // add this import
 
 function PostDetail() {
   const { id } = useParams();
   const [post, setPost] = useState(null);
 
   useEffect(() => {
-    fetch(`/api/posts/${id}`, { credentials: "omit" })
+    apiFetch(`/api/posts/${id}`)
       .then((res) => res.json())
       .then((data) => setPost(data.post));
   }, [id]);
