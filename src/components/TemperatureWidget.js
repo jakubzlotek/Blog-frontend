@@ -15,7 +15,7 @@ export default function TemperatureWidget() {
     navigator.geolocation.getCurrentPosition(
       ({ coords }) => {
         const { latitude, longitude } = coords;
-        const url = `https://wttr.in/${latitude},${longitude}?format=%t`;
+        const url = `http://wttr.in/${latitude},${longitude}?format=%t`;
 
         fetch(url)
           .then(res => {
