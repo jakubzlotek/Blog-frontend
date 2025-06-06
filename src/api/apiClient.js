@@ -55,5 +55,5 @@ export async function apiFetch(path, options = {}) {
 export function getAvatarUrl(avatar_url) {
   if (!avatar_url) return null;
   if (avatar_url.startsWith("http")) return avatar_url;
-  return `${API_BASE_URL}${avatar_url}`;
+  return `${API_BASE_URL}/api/${avatar_url}`;
 }
