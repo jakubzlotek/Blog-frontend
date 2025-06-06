@@ -85,6 +85,23 @@ function UserProfile() {
 
   const handleSubmit = async e => {
     e.preventDefault();
+
+    // --- Validation ---
+    if (!form.username.trim()) {
+      toast.error('Username cannot be empty');
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(form.email)) {
+      toast.error('Invalid email format');
+      return;
+    }
+    if (form.password && form.password.length < 6) {
+      toast.error('Password must be at least 6 characters');
+      return;
+    }
+    // --- End validation ---
+
     setEditLoading(true);
     const token = localStorage.getItem('token');
     const res = await authFetch('/api/user/me', {
@@ -104,7 +121,7 @@ function UserProfile() {
       toast.success('Profile updated!');
       setTimeout(() => {
         window.location.reload();
-      }, 800); // <-- short delay before reload
+      }, 800);
     } else {
       toast.error('Could not update profile');
     }
