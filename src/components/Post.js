@@ -11,7 +11,7 @@ import { FaXTwitter } from "react-icons/fa6"; // Add this import at the top with
 import { Link } from "react-router-dom";
 import { toast } from 'react-hot-toast';
 import { authFetch, apiFetch } from '../api/apiClient';
-import { getAvatarUrl } from '../api/apliClient';
+import { getAvatarUrl } from '../api/apiClient';
 
 function Post({ post, onDelete }) {
   const [likesCount, setLikesCount] = useState(post.likesCount || 0);
