@@ -9,6 +9,7 @@ import Register from "./components/Register";
 import Home from "./pages/Home";
 import PostDetail from "./pages/PostDetail";
 import UserProfile from "./pages/UserProfile";
+import SearchResults from "./pages/SearchResults";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -94,6 +95,7 @@ function App() {
         <Route path="/user/:id" element={<UserProfile />} />
         <Route path="/login" element={<Login onLogin={onLogin} />} />
         <Route path="/register" element={<Register onRegister={onRegister} />} />
+        <Route path="/search" element={<SearchResults />} />
       </Routes>
     </Router>
   );

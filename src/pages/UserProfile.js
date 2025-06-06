@@ -98,8 +98,12 @@ function UserProfile() {
     if (res.ok) {
       const updated = await res.json();
       setUser(updated.user);
+      localStorage.setItem('user', JSON.stringify(updated.user));
       setEditing(false);
       toast.success('Profile updated!');
+      setTimeout(() => {
+        window.location.reload();
+      }, 800); // <-- short delay before reload
     } else {
       toast.error('Could not update profile');
     }
